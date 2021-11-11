@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19461" systemVersion="21C5031d" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Item" representedClassName="Item" syncable="YES" codeGenerationType="class">
+        <attribute name="index" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES">
+            <userInfo>
+                <entry key="exclude" value="value"/>
+            </userInfo>
+        </attribute>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="noteID" optional="YES" attributeType="UUID" usesScalarValueType="NO">
+            <userInfo>
+                <entry key="followParent" value="id"/>
+            </userInfo>
+        </attribute>
+        <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="items" inverseEntity="Note"/>
+        <relationship name="toManyTags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ToManyTag" inverseName="items" inverseEntity="ToManyTag"/>
+        <relationship name="toOneTag" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ToOneTag" inverseName="items" inverseEntity="ToOneTag"/>
+    </entity>
+    <entity name="Note" representedClassName="Note" syncable="YES" codeGenerationType="class">
+        <attribute name="createDate" optional="YES" attributeType="Date" usesScalarValueType="NO">
+            <userInfo>
+                <entry key="rebuild" value="now"/>
+            </userInfo>
+        </attribute>
+        <attribute name="data" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="derived" optional="YES" attributeType="Integer 32" derived="YES" derivationExpression="items.@count" usesScalarValueType="YES"/>
+        <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO">
+            <userInfo>
+                <entry key="rebuild" value="uuid"/>
+            </userInfo>
+        </attribute>
+        <attribute name="index" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" spotlightIndexingEnabled="YES"/>
+        <attribute name="transient" transient="YES" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Item" inverseName="note" inverseEntity="Item"/>
+    </entity>
+    <entity name="ToManyTag" representedClassName="ToManyTag" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="toManyTags" inverseEntity="Item"/>
+    </entity>
+    <entity name="ToOneTag" representedClassName="ToOneTag" syncable="YES" codeGenerationType="class">
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <relationship name="items" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Item" inverseName="toOneTag" inverseEntity="Item"/>
+    </entity>
+    <elements>
+        <element name="Item" positionX="-54" positionY="45" width="128" height="119"/>
+        <element name="Note" positionX="-63" positionY="-18" width="128" height="149"/>
+        <element name="ToManyTag" positionX="-27" positionY="90" width="128" height="59"/>
+        <element name="ToOneTag" positionX="-36" positionY="54" width="128" height="59"/>
+    </elements>
+</model>
