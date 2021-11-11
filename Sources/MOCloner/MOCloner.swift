@@ -33,6 +33,7 @@ public struct MOCloner {
         /// 对于关系来说，要求该关系为optional
         var exclude: String
 
+        /// strict = false 时，在followParent无法获取到对应值的时候，仍可继续执行。
         var strict: String
     }
 
