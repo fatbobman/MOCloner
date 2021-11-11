@@ -227,6 +227,37 @@ final class MOClonerTests: XCTestCase {
             }
         }
     }
+
+    func testStrictAndExclud() {
+        let context = container.viewContext
+        context.performAndWait {
+            let note = Note(context: context)
+            note.name = "note1"
+            note.createDate = Date().addingTimeInterval(-100000)
+            note.id = UUID()
+            note.data = String("hello").data(using: .utf8)
+            note.index = 0
+            note.transient = false
+
+            let item1 = Item(context: context)
+            item1.name = "item1"
+            item1.note = note
+            item1.index = 3
+
+            let item2 = Item(context: context)
+            item2.note = note
+            item2.index = 3
+            item2.name = "item2"
+
+            context.saveWhenChanged()
+
+            let cloneItem1 = try! cloner.cloneNSMangedObject(item1,excludingRelationShipNames: ["note"]) as! Item
+            XCTAssertNil(cloneItem1.note)
+            XCTAssertEqual(cloneItem1.noteID, item1.noteID)
+        }
+    }
+
+
 }
 
 extension NSManagedObjectContext {

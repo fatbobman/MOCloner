@@ -10,6 +10,7 @@
         <attribute name="noteID" optional="YES" attributeType="UUID" usesScalarValueType="NO">
             <userInfo>
                 <entry key="followParent" value="id"/>
+                <entry key="strict" value="false"/>
             </userInfo>
         </attribute>
         <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="items" inverseEntity="Note"/>
@@ -49,9 +50,9 @@
     </entity>
     <elements>
         <element name="Item" positionX="-54" positionY="45" width="128" height="119"/>
+        <element name="Memo" positionX="0" positionY="117" width="128" height="59"/>
         <element name="Note" positionX="-63" positionY="-18" width="128" height="164"/>
         <element name="ToManyTag" positionX="-27" positionY="90" width="128" height="59"/>
         <element name="ToOneTag" positionX="-36" positionY="54" width="128" height="59"/>
-        <element name="Memo" positionX="0" positionY="117" width="128" height="59"/>
     </elements>
 </model>

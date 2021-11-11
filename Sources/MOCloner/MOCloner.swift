@@ -99,9 +99,7 @@ public struct MOCloner {
                         newValue = parentObject.primitiveValue(forKey: parentAttributeName)
                     } else {
                         // strict = false 是，运行跳过followParent，保留原值
-                        guard let strict = userInfo[config.strict] as? String,
-                              strict == "false",
-                              attributeDescription.isOptional || attributeDescription.defaultValue != nil else {
+                        guard let strict = userInfo[config.strict] as? String, strict == "false" else {
                             throw CloneNSManagedObjectError.followParentError
                         }
                     }
