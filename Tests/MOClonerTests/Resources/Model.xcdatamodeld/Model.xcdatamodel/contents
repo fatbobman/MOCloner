@@ -28,7 +28,7 @@
             </userInfo>
         </attribute>
         <attribute name="data" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
-        <attribute name="derived" optional="YES" attributeType="Integer 32" derived="YES" derivationExpression="items.@count" usesScalarValueType="YES"/>
+        <attribute name="derived" optional="YES" attributeType="Integer 32" usesScalarValueType="YES"/>
         <attribute name="id" optional="YES" attributeType="UUID" usesScalarValueType="NO">
             <userInfo>
                 <entry key="rebuild" value="uuid"/>

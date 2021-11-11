@@ -157,7 +157,7 @@ final class MOClonerTests: XCTestCase {
     }
 
     /// relationship is to many ,invert relationship is to many
-    func testtestCloneObjectWithManyToMany2(){
+    func testtestCloneObjectWithManyToMany2() {
         let context = container.viewContext
         context.performAndWait {
             let note = Note(context: context)
@@ -199,8 +199,6 @@ final class MOClonerTests: XCTestCase {
 
             XCTAssertEqual(tag1.items?.count, 4)
             XCTAssertEqual(tag2.items?.count, 2)
-
-
         }
     }
 
@@ -227,7 +225,7 @@ final class MOClonerTests: XCTestCase {
 
             if let memos = cloneNote.memos?.array as? [Memo] {
                 for i in 0..<30 {
-                   XCTAssertEqual(memos[i].text, "\(i)") 
+                    XCTAssertEqual(memos[i].text, "\(i)")
                 }
             }
         }
@@ -256,13 +254,11 @@ final class MOClonerTests: XCTestCase {
 
             context.saveWhenChanged()
 
-            let cloneItem1 = try! cloner.cloneNSMangedObject(item1,excludingRelationShipNames: ["note"]) as! Item
+            let cloneItem1 = try! cloner.cloneNSMangedObject(item1, excludingRelationShipNames: ["note"]) as! Item
             XCTAssertNil(cloneItem1.note)
             XCTAssertEqual(cloneItem1.noteID, item1.noteID)
         }
     }
-
-
 }
 
 extension NSManagedObjectContext {

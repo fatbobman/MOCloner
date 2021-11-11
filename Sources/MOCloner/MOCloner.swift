@@ -1,10 +1,25 @@
+//
+//  MOClone.swift
+//  MOCloner
+//
+//  Created by Yang Xu on 2021/11/11
+//  Copyright © 2021 Yang Xu. All rights reserved.
+//
+//  Follow me on Twitter: @fatbobman
+//  My Blog: https://www.fatbobman.com
+//  微信公共号: 肘子的Swift记事本
+//
+
 import CoreData
 import Foundation
 
+/// MOCloner can help to implement deep copy of NSManagedObject.
+/// By adding flags to the userinfo of Attribute or Relationships in the Data Model Editor, MOCloner provides partial control during deep copy.
+/// For objects with complex relationships, it is better to create a private context for the clone operation
 public struct MOCloner {
     public init() {}
 
-    /// 可以定制userInfo的Key，防止冲突
+    /// To prevent conflicts with your previously used Key  in userinfo, you can customize the Key name by MOClonerUserInfoKeyConfig.
     public struct MOClonerUserInfoKeyConfig {
         public init(rebuild: String = "rebuild",
                     followParent: String = "followParent",
@@ -16,27 +31,34 @@ public struct MOCloner {
             self.exclude = exclude
         }
 
-        // 添加在Attribut的userinfo中
-
-        /// 表示该属性内容不复制，使用指定rebuild命令生成。
-        /// 值目前支持 ：
-        ///            uuid 重新生成uuid 要求属性类型为UUID
-        ///            now 生成当时的日期 要求属性类型为Date
+        /// Don't copy the original value , rebuild a new value for attribute
         var rebuild: String
 
-        /// 改属性不复制，使用parent Entity的指定attribute
-        /// 值为Entity的attribute Name，要求类型一致
+        /// Using parentObject-specific property values in a relational chain
         var followParent: String
 
-        /// 表示该属性或关系将不被复制
-        /// 对于属性来说，要求该属性为optional，或有Default Value
-        /// 对于关系来说，要求该关系为optional
+        /// All data under the tagged attribute or relationship will be ignored when clone
         var exclude: String
 
-        /// strict = false 时，在followParent无法获取到对应值的时候，仍可继续执行。
+        /// If strict is false, the execution will continue if followParent cannot get the corresponding value.
         var strict: String
     }
 
+    /// cloneNSMangedObject Initialization
+    ///
+    /// example:
+    ///
+    ///         let cloner = MOCloner()
+    ///         let cloneNote = try cloner.cloneNSMangedObject(note) as? Note
+    ///
+    /// - Parameters:
+    ///   - originalObject: Cloned objects
+    ///   - parentObject: For use inside methods, keep it in nil
+    ///   - excludingRelationShipNames: You can set the name of the relationship to be ignored by the root object during the clone process here
+    ///   - saveBeforeReturn: Whether to complete persistence before returning the cloned object
+    ///   - root: For use inside methods, keep it in tru
+    ///   - config: MOCloner
+    /// - Returns: If you need to customize the name of the Key in userinfo, you can create your own MOClonerUserInfoKeyConfig
     public func cloneNSMangedObject(
         _ originalObject: NSManagedObject,
         parentObject: NSManagedObject? = nil,
@@ -49,7 +71,7 @@ public struct MOCloner {
             throw CloneNSManagedObjectError.contextError
         }
 
-        // 新建NSManagedObject
+        // create clone NSManagedObject
         guard let entityName = originalObject.entity.name else {
             throw CloneNSManagedObjectError.entityNameError
         }
@@ -58,12 +80,15 @@ public struct MOCloner {
             into: context
         )
 
-        // 处理 Attributes
+        // MARK: - Attributes
+
         let attributes = originalObject.entity.attributesByName
         for (attributeName, attributeDescription) in attributes {
             var newValue = originalObject.primitiveValue(forKey: attributeName)
             if let userInfo = attributeDescription.userInfo {
-                // 检查是否被排除
+
+                // Check if the "exclude" flag is added to this attribute
+                // Only detemine whether the Key is "exclude" or note, do not care about the Vlaue
                 if userInfo[config.exclude] != nil {
                     if attributeDescription.isOptional || attributeDescription.defaultValue != nil {
                         continue
@@ -72,7 +97,9 @@ public struct MOCloner {
                     }
                 }
 
-                // 检查是否需要rebuild
+                // check if the attribute need to "rebuild" , for example: "rebuild:uuid"
+                // "uuid"  -> make a new UUID
+                // "now"   -> Date.now
                 if let action = userInfo[config.rebuild] as? String {
                     switch action {
                     case "uuid":
@@ -92,14 +119,22 @@ public struct MOCloner {
                     }
                 }
 
-                // 检查是否需要followParent
+                // Check if the "followParent" flag is added to thie attribut
+                // Value is the name of the attribute of the object at the upper end of the corresponding
+                // relationship chain. The corresponding attribute type need to be excactly the same.
+                // For example, for the attribute "noteID", set flag "followParent:id"
+                // then the "noteID" will get the value of the proerty of the object on the corresponding relationship
+                // chain when it is clone.
                 if let parentAttributeName = userInfo[config.followParent] as? String {
                     if let parentObject = parentObject,
                        let parentAttributeDescription = parentObject.entity.attributesByName[parentAttributeName],
                        parentAttributeDescription.attributeType == attributeDescription.attributeType {
                         newValue = parentObject.primitiveValue(forKey: parentAttributeName)
                     } else {
-                        // strict = false 是，运行跳过followParent，保留原值
+                        /*
+                         in some cases, the user may clone object starting from the middle of a complete chain
+                         of relations. The original "followParent" flag can be ignored by setting "strict" to "false"
+                         */
                         guard let strict = userInfo[config.strict] as? String, strict == "false" else {
                             throw CloneNSManagedObjectError.followParentError
                         }
@@ -110,45 +145,54 @@ public struct MOCloner {
             cloneObject.setPrimitiveValue(newValue, forKey: attributeName)
         }
 
-        // 处理 relationship
+        // MARK: - Relationships
+
         let relationships = originalObject.entity.relationshipsByName
 
         for (relationshipName, relationshipDescription) in relationships {
-            // 处理 exclude
+
+            // In some cases, the user does note need to set "exclude" in relationship userinfo,
+            // but adds the relations to be ignored in the "excludingRelationShipName" pareameter of this method.
+            // The content of the parameter is note passed down and will only be judged when cloning the root object.
             if excludingRelationShipNames.contains(relationshipName) {
                 continue
             }
 
+            // You can set "exclude" in the userinfo of a relationship to compltely ignore
+            // the data in a relationship chain when clone
             if let userInfo = relationshipDescription.userInfo,
                userInfo[config.exclude] != nil {
                 continue
             }
 
-            // 不处理 Parent Relationship, inverseEntity为另一侧的Entity
+            // Ignore the relationship between the incoming direction
             if let parentObject = parentObject,
                let inverseEntity = relationshipDescription.inverseRelationship?.entity,
                inverseEntity == parentObject.entity {
                 continue
             }
 
-            // 关系的另一侧是ToMany，不复制对侧，将oriangelObject添加到对侧的关系中
+            // MARK: inverse relationship is To-Many
+
+            // When To-Many is below the relationship chain, the data below is not cloned.
+            // only the new object of the cureent clone is added to the objects below the relationship chain
             if let inverseRelDesc = relationshipDescription.inverseRelationship, inverseRelDesc.isToMany {
-                // 关系本侧为 ToOne
+                // To-One vs To-Many
                 if !relationshipDescription.isToMany,
                    let origainlToOneObject = originalObject.primitiveValue(forKey: relationshipName) {
-                    // 将对侧关系的Entity实例直接添加给cloneObject
-                    // 设置关系不可以设置原始值
+                    // only setValue can be used for inverse relationship(To-Many)
                     cloneObject.setValue(origainlToOneObject, forKey: relationshipName)
                 } else {
-                    // ToMany
+                    // To-Many vs To-Many
                     let originalToManyObjects = originalObject.primitiveValue(forKey: relationshipName)
                     cloneObject.setValue(originalToManyObjects, forKey: relationshipName)
                 }
                 continue
             }
 
-            // 关系的另一侧是ToOne
-            // ToOne
+            // inverse relationship is To-One
+
+            // TO-One
             if !relationshipDescription.isToMany,
                let originalToOneObject = originalObject.primitiveValue(forKey: relationshipName) as? NSManagedObject {
                 let newToOneObject = try cloneNSMangedObject(
@@ -163,7 +207,7 @@ public struct MOCloner {
             } else {
                 // ToMany
                 var newToManyObjects = [NSManagedObject]()
-                // clone 对侧的所有托管对象
+                // check whether the relationship is be marked ordered. NSOrderSet
                 if relationshipDescription.isOrdered {
                     if let originalToManyObjects = (originalObject.primitiveValue(forKey: relationshipName) as? NSOrderedSet) {
                         for needToCloneObject in originalToManyObjects {
@@ -198,7 +242,6 @@ public struct MOCloner {
                     }
                 }
 
-                // 将clone后的对侧对象序列赋值给cloneObject
                 if !newToManyObjects.isEmpty {
                     if relationshipDescription.isOrdered {
                         let objects = NSOrderedSet(array: newToManyObjects)
@@ -211,7 +254,7 @@ public struct MOCloner {
             }
         }
 
-        // 持久化
+        // persistent
         if root, saveBeforeReturn, context.hasChanges {
             try context.save()
         }

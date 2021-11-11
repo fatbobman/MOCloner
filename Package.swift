@@ -6,8 +6,7 @@ import PackageDescription
 let package = Package(
     name: "MOCloner",
     platforms: [
-//        .macOS(.v10_15),
-        .macOS(.v12),
+        .macOS(.v10_13),
         .iOS(.v11),
         .tvOS(.v11),
         .watchOS(.v4)
@@ -16,7 +15,8 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "MOCloner",
-            targets: ["MOCloner"]),
+            targets: ["MOCloner"]
+        )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -27,13 +27,11 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
             name: "MOCloner",
-            dependencies: []),
+            dependencies: []
+        ),
         .testTarget(
             name: "MOClonerTests",
-            dependencies: ["MOCloner"]//,
-//            resources: [
-//                .copy("Resources/ModelWithoutRelationship.xcdatamodeld")
-//            ]
-        ),
+            dependencies: ["MOCloner"]
+        )
     ]
 )
