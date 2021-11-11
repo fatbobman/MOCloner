@@ -6,9 +6,13 @@ public struct MOCloner {
 
     /// 可以定制userInfo的Key，防止冲突
     public struct MOClonerUserInfoKeyConfig {
-        public init(rebuild: String = "rebuild", followParent: String = "followParent", exclude: String = "exclude") {
+        public init(rebuild: String = "rebuild",
+                    followParent: String = "followParent",
+                    strict: String = "strict",
+                    exclude: String = "exclude") {
             self.rebuild = rebuild
             self.followParent = followParent
+            self.strict = strict
             self.exclude = exclude
         }
 
@@ -28,6 +32,8 @@ public struct MOCloner {
         /// 对于属性来说，要求该属性为optional，或有Default Value
         /// 对于关系来说，要求该关系为optional
         var exclude: String
+
+        var strict: String
     }
 
     public func cloneNSMangedObject(
@@ -92,7 +98,12 @@ public struct MOCloner {
                        parentAttributeDescription.attributeType == attributeDescription.attributeType {
                         newValue = parentObject.primitiveValue(forKey: parentAttributeName)
                     } else {
-                        throw CloneNSManagedObjectError.followParentError
+                        // strict = false 是，运行跳过followParent，保留原值
+                        guard let strict = userInfo[config.strict] as? String,
+                              strict == "false",
+                              attributeDescription.isOptional || attributeDescription.defaultValue != nil else {
+                            throw CloneNSManagedObjectError.followParentError
+                        }
                     }
                 }
             }
@@ -102,7 +113,6 @@ public struct MOCloner {
 
         // 处理 relationship
         let relationships = originalObject.entity.relationshipsByName
-
 
         for (relationshipName, relationshipDescription) in relationships {
             // 处理 exclude
@@ -118,21 +128,19 @@ public struct MOCloner {
             // 不处理 Parent Relationship, inverseEntity为另一侧的Entity
             if let parentObject = parentObject,
                let inverseEntity = relationshipDescription.inverseRelationship?.entity,
-               inverseEntity == parentObject.entity{
+               inverseEntity == parentObject.entity {
                 continue
             }
 
             // 关系的另一侧是ToMany，不复制对侧，将oriangelObject添加到对侧的关系中
             if let inverseRelDesc = relationshipDescription.inverseRelationship, inverseRelDesc.isToMany {
-
                 // 关系本侧为 ToOne
                 if !relationshipDescription.isToMany,
-                   let origainlToOneObject = originalObject.primitiveValue(forKey: relationshipName)  {
+                   let origainlToOneObject = originalObject.primitiveValue(forKey: relationshipName) {
                     // 将对侧关系的Entity实例直接添加给cloneObject
                     // 设置关系不可以设置原始值
                     cloneObject.setValue(origainlToOneObject, forKey: relationshipName)
                 } else {
-                    
                     // ToMany
                     let originalToManyObjects = originalObject.primitiveValue(forKey: relationshipName)
                     cloneObject.setValue(originalToManyObjects, forKey: relationshipName)
@@ -157,9 +165,6 @@ public struct MOCloner {
                 // ToMany
                 var newToManyObjects = [NSManagedObject]()
                 // clone 对侧的所有托管对象
-                print("---")
-                print(relationshipName)
-                print(relationshipDescription)
                 if relationshipDescription.isOrdered {
                     if let originalToManyObjects = (originalObject.primitiveValue(forKey: relationshipName) as? NSOrderedSet) {
                         for needToCloneObject in originalToManyObjects {
@@ -225,8 +230,8 @@ public struct MOCloner {
     }
 }
 
-extension NSManagedObject{
-    static var name:String{
+extension NSManagedObject {
+    static var name: String {
         entity().name ?? ""
     }
 }

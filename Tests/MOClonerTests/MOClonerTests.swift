@@ -188,7 +188,6 @@ final class MOClonerTests: XCTestCase {
 
             context.saveWhenChanged()
 
-            let cloneNote = try! cloner.cloneNSMangedObject(note) as! Note
             // check tag count
             let requestTagCount = NSFetchRequest<NSNumber>(entityName: ToManyTag.name)
             requestTagCount.resultType = .countResultType
@@ -197,6 +196,35 @@ final class MOClonerTests: XCTestCase {
 
             XCTAssertEqual(tag1.items?.count, 4)
             XCTAssertEqual(tag2.items?.count, 2)
+        }
+    }
+
+    func testToManyOrdered() {
+        let context = container.viewContext
+        context.performAndWait {
+            let note = Note(context: context)
+            note.name = "note1"
+            note.createDate = Date().addingTimeInterval(-100000)
+            note.id = UUID()
+            note.data = String("hello").data(using: .utf8)
+            note.index = 0
+            note.transient = false
+
+            for i in 0..<30 {
+                let memo = Memo(context: context)
+                memo.text = "\(i)"
+                memo.note = note
+            }
+
+            context.saveWhenChanged()
+
+            let cloneNote = try! cloner.cloneNSMangedObject(note) as! Note
+
+            if let memos = cloneNote.memos?.array as? [Memo] {
+                for i in 0..<30 {
+                   XCTAssertEqual(memos[i].text, "\(i)") 
+                }
+            }
         }
     }
 }
