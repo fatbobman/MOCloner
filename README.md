@@ -1,3 +1,5 @@
 # MOCloner
 
-A description of this package.
+A tiny library that implements deep copy of NSManagedObject
+
+
