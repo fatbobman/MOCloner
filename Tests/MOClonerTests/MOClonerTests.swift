@@ -188,6 +188,9 @@ final class MOClonerTests: XCTestCase {
 
             context.saveWhenChanged()
 
+            let cloneNote = try! cloner.cloneNSMangedObject(note) as! Note
+            XCTAssertNotEqual(cloneNote.id, note.id)
+
             // check tag count
             let requestTagCount = NSFetchRequest<NSNumber>(entityName: ToManyTag.name)
             requestTagCount.resultType = .countResultType
@@ -196,6 +199,8 @@ final class MOClonerTests: XCTestCase {
 
             XCTAssertEqual(tag1.items?.count, 4)
             XCTAssertEqual(tag2.items?.count, 2)
+
+
         }
     }
 
