@@ -177,16 +177,8 @@ public struct MOCloner {
             // When To-Many is below the relationship chain, the data below is not cloned.
             // only the new object of the cureent clone is added to the objects below the relationship chain
             if let inverseRelDesc = relationshipDescription.inverseRelationship, inverseRelDesc.isToMany {
-                // To-One vs To-Many
-                if !relationshipDescription.isToMany,
-                   let origainlToOneObject = originalObject.primitiveValue(forKey: relationshipName) {
-                    // only setValue can be used for inverse relationship(To-Many)
-                    cloneObject.setValue(origainlToOneObject, forKey: relationshipName)
-                } else {
-                    // To-Many vs To-Many
-                    let originalToManyObjects = originalObject.primitiveValue(forKey: relationshipName)
-                    cloneObject.setValue(originalToManyObjects, forKey: relationshipName)
-                }
+                let relationshipObjects = originalObject.primitiveValue(forKey: relationshipName)
+                cloneObject.setValue(relationshipObjects, forKey: relationshipName)
                 continue
             }
 
@@ -203,7 +195,7 @@ public struct MOCloner {
                     root: false,
                     config: config
                 )
-                cloneObject.setPrimitiveValue(newToOneObject, forKey: relationshipName)
+                cloneObject.setValue(newToOneObject, forKey: relationshipName)
             } else {
                 // ToMany
                 var newToManyObjects = [NSManagedObject]()
