@@ -64,7 +64,7 @@ public struct MOCloner {
         _ originalObject: NSManagedObject,
         parentObject: NSManagedObject? = nil,
         excludedRelationshipNames: [String] = [],
-        passingExclusionList:Bool = false,
+        passingExclusionList: Bool = false,
         saveBeforeReturn: Bool = true,
         root: Bool = true,
         config: MOClonerUserInfoKeyConfig = MOClonerUserInfoKeyConfig()
@@ -88,7 +88,6 @@ public struct MOCloner {
         for (attributeName, attributeDescription) in attributes {
             var newValue = originalObject.primitiveValue(forKey: attributeName)
             if let userInfo = attributeDescription.userInfo {
-
                 // Check if the "exclude" flag is added to this attribute
                 // Only detemine whether the Key is "exclude" or note, do not care about the Vlaue
                 if userInfo[config.exclude] != nil {
@@ -152,7 +151,6 @@ public struct MOCloner {
         let relationships = originalObject.entity.relationshipsByName
 
         for (relationshipName, relationshipDescription) in relationships {
-
             // In some cases, the user does note need to set "exclude" in relationship userinfo,
             // but adds the relations to be ignored in the "excludingRelationShipName" pareameter of this method.
             // Use the passingExclusionList to set whether to pass down the exclusion list
