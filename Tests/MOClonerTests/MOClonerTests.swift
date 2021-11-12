@@ -254,7 +254,7 @@ final class MOClonerTests: XCTestCase {
 
             context.saveWhenChanged()
 
-            let cloneItem1 = try! cloner.cloneNSMangedObject(item1, excludingRelationShipNames: ["note"]) as! Item
+            let cloneItem1 = try! cloner.cloneNSMangedObject(item1, excludedRelationshipNames: ["note"]) as! Item
             XCTAssertNil(cloneItem1.note)
             XCTAssertEqual(cloneItem1.noteID, item1.noteID)
         }
