@@ -245,10 +245,10 @@ public struct MOCloner {
                 if !newToManyObjects.isEmpty {
                     if relationshipDescription.isOrdered {
                         let objects = NSOrderedSet(array: newToManyObjects)
-                        cloneObject.setPrimitiveValue(objects, forKey: relationshipName)
+                        cloneObject.setValue(objects, forKey: relationshipName)
                     } else {
                         let objects = NSSet(array: newToManyObjects)
-                        cloneObject.setPrimitiveValue(objects, forKey: relationshipName)
+                        cloneObject.setValue(objects, forKey: relationshipName)
                     }
                 }
             }
