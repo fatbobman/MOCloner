@@ -23,11 +23,11 @@ public struct MOCloner {
     public struct MOClonerUserInfoKeyConfig {
         public init(rebuild: String = "rebuild",
                     followParent: String = "followParent",
-                    strict: String = "strict",
+                    withoutParent: String = "withoutParent",
                     exclude: String = "exclude") {
             self.rebuild = rebuild
             self.followParent = followParent
-            self.strict = strict
+            self.withoutParent = withoutParent
             self.exclude = exclude
         }
 
@@ -40,8 +40,8 @@ public struct MOCloner {
         /// All data under the tagged attribute or relationship will be ignored when clone
         var exclude: String
 
-        /// If strict is false, the execution will continue if followParent cannot get the corresponding value.
-        var strict: String
+        /// If withoutParent is "keep" or "blank", the execution will continue if followParent cannot get the corresponding value.
+        var withoutParent: String
     }
 
     /// cloneNSMangedObject Initialization
@@ -86,6 +86,7 @@ public struct MOCloner {
 
         let attributes = originalObject.entity.attributesByName
         for (attributeName, attributeDescription) in attributes {
+            var skip = false
             var newValue = originalObject.primitiveValue(forKey: attributeName)
             if let userInfo = attributeDescription.userInfo {
                 // Check if the "exclude" flag is added to this attribute
@@ -134,16 +135,30 @@ public struct MOCloner {
                     } else {
                         /*
                          in some cases, the user may clone object starting from the middle of a complete chain
-                         of relations. The original "followParent" flag can be ignored by setting "strict" to "false"
+                         of relations. The original "followParent" flag can be ignored by setting "withoutParent" to "keep" or "blank"
                          */
-                        guard let strict = userInfo[config.strict] as? String, strict == "false" else {
+                        if let withoutParent = userInfo[config.withoutParent] as? String {
+                            switch withoutParent {
+                            case "keep": // keep the original value
+                                break
+                            case "blank": // use optional or default value
+                                guard attributeDescription.isOptional || attributeDescription.defaultValue != nil else {
+                                    throw CloneNSManagedObjectError.followParentError
+                                }
+                                skip = true
+                            default:
+                                throw CloneNSManagedObjectError.followParentError
+                            }
+                        } else {
                             throw CloneNSManagedObjectError.followParentError
                         }
                     }
                 }
             }
 
-            cloneObject.setPrimitiveValue(newValue, forKey: attributeName)
+            if !skip {
+                cloneObject.setPrimitiveValue(newValue, forKey: attributeName)
+            }
         }
 
         // MARK: - Relationships

@@ -10,7 +10,7 @@
         <attribute name="noteID" optional="YES" attributeType="UUID" usesScalarValueType="NO">
             <userInfo>
                 <entry key="followParent" value="id"/>
-                <entry key="strict" value="false"/>
+                <entry key="withoutParent" value="blank"/>
             </userInfo>
         </attribute>
         <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="items" inverseEntity="Note"/>

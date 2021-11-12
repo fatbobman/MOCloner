@@ -246,17 +246,19 @@ final class MOClonerTests: XCTestCase {
             item1.name = "item1"
             item1.note = note
             item1.index = 3
+            item1.noteID = UUID()
 
             let item2 = Item(context: context)
             item2.note = note
             item2.index = 3
             item2.name = "item2"
+            item2.noteID = UUID()
 
             context.saveWhenChanged()
 
             let cloneItem1 = try! cloner.cloneNSMangedObject(item1, excludedRelationshipNames: ["note"]) as! Item
             XCTAssertNil(cloneItem1.note)
-            XCTAssertEqual(cloneItem1.noteID, item1.noteID)
+            XCTAssertNotEqual(cloneItem1.noteID, item1.noteID)
         }
     }
 }
