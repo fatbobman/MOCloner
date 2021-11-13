@@ -134,4 +134,4 @@ MOCloner uses the [MIT](https://github.com/fatbobman/MOCloner/blob/main/LICENSE)
 
 Core Data provides a rich set of features and options that developers can use to create a large number of different combinations of relationship graphs. MOCloner has only been tested for some of these cases. Therefore, before you start preparing MOCloner for use in your project, it is highly recommended that you take some time to familiarize yourself with its implementation and do more unit testing in case you encounter any possible data error issues.
 
-If you find problems, bugs, or want to suggest improvements, create [Issues](https://github.com/fatbobman/MOCloner/issues) or [Pull Request](https://github.com/fatbobman/MOCloner /pulls).
+If you find problems, bugs, or want to suggest improvements, create [Issues](https://github.com/fatbobman/MOCloner/issues) or [Pull Request](https://github.com/fatbobman/MOCloner/pulls).
