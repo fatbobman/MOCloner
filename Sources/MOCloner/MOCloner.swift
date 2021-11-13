@@ -103,7 +103,7 @@ public struct MOCloner {
                 // "uuid"  -> make a new UUID
                 // "now"   -> Date.now
                 if let action = userInfo[config.rebuild] as? String {
-                    switch action {
+                    switch action.lowercased() {
                     case "uuid":
                         if attributeDescription.attributeType == NSAttributeType.UUIDAttributeType {
                             newValue = UUID()
@@ -138,7 +138,7 @@ public struct MOCloner {
                          of relations. The original "followParent" flag can be ignored by setting "withoutParent" to "keep" or "blank"
                          */
                         if let withoutParent = userInfo[config.withoutParent] as? String {
-                            switch withoutParent {
+                            switch withoutParent.lowercased() {
                             case "keep": // keep the original value
                                 break
                             case "blank": // use optional or default value
