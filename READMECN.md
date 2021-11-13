@@ -1,6 +1,6 @@
 # MOCloner #
 
-MOCloner 是一个很小的库，旨在实现对 NSManagedObject 的可定制深拷贝。支持 one-to-one、one-to-many、many-many 等关系方式。除了忠于原始数据的拷贝方式外，还提供了选择性拷贝、拷贝时生成新值等功能。
+MOCloner 是一个很小的库，旨在实现对 NSManagedObject 的可定制深拷贝。支持 one-to-one、one-to-many、many-to-many 等关系方式。除了忠于原始数据的拷贝方式外，还提供了选择性拷贝、拷贝时生成新值等功能。
 
 ## 实现原理 ##
 
@@ -125,7 +125,7 @@ import MOCloner
 * 在深拷贝时，将内存占用较高的属性或关系暂时排除。深拷贝后，通过其它的代码再为其逐个添加。
 * 深拷贝多个托管对象时，考虑通过 performBackgroundTask 逐个进行。
 
-## 版本与支持 ##
+## 版权与支持 ##
 
 MOCloner 采用 [MIT](https://github.com/fatbobman/MOCloner/blob/main/LICENSE) 协议，你可以自由地在项目中使用它。但请注意，MOCloner 不附带任何官方支持渠道。
 
