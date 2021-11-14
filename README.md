@@ -21,7 +21,7 @@ When encountering an Entity whose reverse relationship is to-many, stop the repl
 Create a deep copy of Note in the image above
 
 ```swift
-let cloneNote = try MOCloner().clone(object: note) as? Note
+let cloneNote = try! MOCloner().clone(object: note) as! Note
 ```
 
 Deep copy down from the middle part of the relationship chain (do not copy the upward part of the relationship chain)
