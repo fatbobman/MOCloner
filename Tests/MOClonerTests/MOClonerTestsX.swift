@@ -1,7 +1,7 @@
 @testable import MOCloner
 import XCTest
 
-final class MOClonerTests: XCTestCase {
+final class MOClonerTests1: XCTestCase {
     lazy var container: NSPersistentContainer = {
         guard let url = Bundle.module.url(forResource: "Model", withExtension: "momd"),
               let managedObjectModel = NSManagedObjectModel(contentsOf: url)
@@ -88,6 +88,7 @@ final class MOClonerTests: XCTestCase {
                     let newItem1 = (cloneNote.items?.allObjects as? [Item])!.first(where: { $0.name == "item1" })!
                     XCTAssertEqual(note.id, newItem1.noteID)
                     XCTAssertNotEqual(newItem1.index, 3)
+                    XCTAssertEqual(newItem1.note, cloneNote)
                 } else {
                     fatalError("clone error")
                 }
@@ -263,15 +264,4 @@ final class MOClonerTests: XCTestCase {
     }
 }
 
-extension NSManagedObjectContext {
-    func saveWhenChanged() {
-        if hasChanges {
-            do {
-                try save()
-            } catch {
-                print(error)
-                fatalError()
-            }
-        }
-    }
-}
+
