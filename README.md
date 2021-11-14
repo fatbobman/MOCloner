@@ -21,14 +21,14 @@ When encountering an Entity whose reverse relationship is to-many, stop the repl
 Create a deep copy of Note in the image above
 
 ```swift
-let cloneNote = try MOCloner().cloneNSMangedObject(note) as? Note
+let cloneNote = try MOCloner().clone(object: note) as? Note
 ```
 
 Deep copy down from the middle part of the relationship chain (do not copy the upward part of the relationship chain)
 
 ```swift
 // Add the exclude relationship names to the excludedRelationshipNames
-let cloneItem = try! MOCloner().cloneNSMangedObject(item, excludedRelationshipNames: ["note"]) as! Item
+let cloneItem = try! MOCloner().clone(object: item, excludedRelationshipNames: ["note"]) as! Item
 ```
 
 ## Customize ##

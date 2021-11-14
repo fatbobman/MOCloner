@@ -44,6 +44,28 @@ public struct MOCloner {
         var withoutParent: String
     }
 
+    /// Clone NSManagedObject
+    /// - Parameters:
+    ///   - object: a NSMangedObject
+    ///   - excludedRelationshipNames: You can set the name of the relationship to be ignored by the root object during the clone process
+    ///   - passingExclusionList: Whether to pass the exclusion list along the relationship chain,It must be ensured that the ignored relationship name is unique throughout the relationship chain. Otherwise it is better to set the exclude in the userinfo of the relationship
+    ///   - saveBeforeReturn: Whether to complete persistence before returning the cloned object
+    ///   - config: MOCloner
+    /// - Returns: object copy
+    public func clone(object: NSManagedObject,
+                      excludedRelationshipNames: [String] = [],
+                      passingExclusionList: Bool = false,
+                      saveBeforeReturn: Bool = true,
+                      config: MOClonerUserInfoKeyConfig = MOClonerUserInfoKeyConfig()) throws -> NSManagedObject {
+        try cloneNSMangedObject(
+            object,
+            excludedRelationshipNames: excludedRelationshipNames,
+            passingExclusionList: passingExclusionList,
+            saveBeforeReturn: saveBeforeReturn,
+            config: config
+        )
+    }
+
     /// cloneNSMangedObject Initialization
     ///
     /// example:
@@ -54,15 +76,17 @@ public struct MOCloner {
     /// - Parameters:
     ///   - originalObject: Cloned objects
     ///   - parentObject: For use inside methods, keep it in nil
+    ///   - parentCloneObject: For use inside methods, keep it in nil
     ///   - excludingRelationShipNames: You can set the name of the relationship to be ignored by the root object during the clone process
     ///   - passingExclusionList: Whether to pass the exclusion list along the relationship chain,It must be ensured that the ignored relationship name is unique throughout the relationship chain. Otherwise it is better to set the exclude in the userinfo of the relationship
     ///   - saveBeforeReturn: Whether to complete persistence before returning the cloned object
     ///   - root: For use inside methods, keep it in tru
     ///   - config: MOCloner
     /// - Returns: If you need to customize the name of the Key in userinfo, you can create your own MOClonerUserInfoKeyConfig
-    public func cloneNSMangedObject(
+    func cloneNSMangedObject(
         _ originalObject: NSManagedObject,
         parentObject: NSManagedObject? = nil,
+        parentCloneObject: NSManagedObject? = nil,
         excludedRelationshipNames: [String] = [],
         passingExclusionList: Bool = false,
         saveBeforeReturn: Bool = true,
@@ -128,7 +152,8 @@ public struct MOCloner {
                 // then the "noteID" will get the value of the proerty of the object on the corresponding relationship
                 // chain when it is clone.
                 if let parentAttributeName = userInfo[config.followParent] as? String {
-                    if let parentObject = parentObject,
+                    // get rebuild new value
+                    if let parentObject = parentCloneObject,
                        let parentAttributeDescription = parentObject.entity.attributesByName[parentAttributeName],
                        parentAttributeDescription.attributeType == attributeDescription.attributeType {
                         newValue = parentObject.primitiveValue(forKey: parentAttributeName)
@@ -205,6 +230,7 @@ public struct MOCloner {
                 let newToOneObject = try cloneNSMangedObject(
                     originalToOneObject,
                     parentObject: nil,
+                    parentCloneObject: cloneObject,
                     excludedRelationshipNames: passingExclusionList ? excludedRelationshipNames : [],
                     saveBeforeReturn: false,
                     root: false,
@@ -222,6 +248,7 @@ public struct MOCloner {
                                 let newObject = try cloneNSMangedObject(
                                     object,
                                     parentObject: originalObject,
+                                    parentCloneObject: cloneObject,
                                     excludedRelationshipNames: passingExclusionList ? excludedRelationshipNames : [],
                                     saveBeforeReturn: false,
                                     root: false,
@@ -238,6 +265,7 @@ public struct MOCloner {
                                 let newObject = try cloneNSMangedObject(
                                     object,
                                     parentObject: originalObject,
+                                    parentCloneObject: cloneObject,
                                     excludedRelationshipNames: passingExclusionList ? excludedRelationshipNames : [],
                                     saveBeforeReturn: false,
                                     root: false,

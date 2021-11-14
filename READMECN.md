@@ -19,14 +19,14 @@ MOCloner 是一个很小的库，旨在实现对 NSManagedObject 的可定制深
 创建上图中 Note 的深拷贝
 
 ```swift
-let cloneNote = try MOCloner().cloneNSMangedObject(note) as? Note
+let cloneNote = try MOCloner().clone(object: note) as? Note
 ```
 
 从关系链中间部分向下深拷贝（不拷贝关系链向上的部分）
 
 ```swift
 // 在 excludedRelationshipNames 中添加忽略的关系名称
-let cloneItem = try! MOCloner().cloneNSMangedObject(item, excludedRelationshipNames: ["note"]) as! Item
+let cloneItem = try! MOCloner().clone(object: item, excludedRelationshipNames: ["note"]) as! Item
 ```
 
 ## 自定义 ##
