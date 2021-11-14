@@ -6,6 +6,8 @@ MOCloner 是一个很小的库，旨在实现对 NSManagedObject 的可定制深
 
 通过 NSAttributeDescription、NSRelationshipDescription 对 NSMangedObject 的属性和关系实现遍历，并通过 userinfo 实现深拷贝参数设置。
 
+更多实现细节，请参阅[如何在 Core Data 中对 NSManagedObject 进行深拷贝](https://www.fatbobman.com/posts/mocloner/)。
+
 ## 深拷贝规则 ##
 
 复制 one-to-one、one-to-many 关系下的全部数据。

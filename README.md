@@ -8,6 +8,8 @@ MOCloner is a tiny library designed to implement a customizable deep copy of NSM
 
 Iterate over the attributes and relationships of NSMangedObject through NSAttributeDescription, NSRelationshipDescription, and set deep copy parameters through userinfo.
 
+For more implementation details, please refer to [如何在 Core Data 中对 NSManagedObject 进行深拷贝](https://www.fatbobman.com/posts/mocloner/).
+
 ## Deep Copy Rules ##
 
 Copy all data under one-to-one and one-to-many relations.
