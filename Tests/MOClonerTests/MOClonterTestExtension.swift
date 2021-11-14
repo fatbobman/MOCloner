@@ -103,6 +103,17 @@ extension MOClonerTests {
         }
         return count
     }
+
+    func memosCount(context:NSManagedObjectContext) -> Int {
+        var count = 0
+        context.performAndWait {
+            let request = NSFetchRequest<NSNumber>(entityName: Memo.name)
+            request.resultType = .countResultType
+            let result = try! context.fetch(request).first!
+            count = result.intValue
+        }
+        return count
+    }
 }
 
 extension NSManagedObjectContext {

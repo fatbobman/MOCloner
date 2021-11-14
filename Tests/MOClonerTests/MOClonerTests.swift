@@ -277,7 +277,7 @@ class MOClonerTests: XCTestCase {
                     }
                 }
                 if tags.count == 2 {
-                    if tags.allSatisfy({[tag1,tag2].contains($0)}) {
+                    if tags.allSatisfy({ [tag1, tag2].contains($0) }) {
                         bothTagsCount += 1
                     }
                 }
@@ -291,6 +291,71 @@ class MOClonerTests: XCTestCase {
 
     // test to-many ordered
     func testToManyOredered() {
-        
+        let context = container.newBackgroundContext()
+        context.performAndWait {
+            // create note
+            let note = newNote(context: context)
+
+            var memos = [Memo]()
+            // create memos ordered
+            for i in 0..<10 {
+                let memo = Memo(context: context)
+                memo.note = note
+                memo.text = "\(i)"
+                memos.append(memo)
+            }
+
+            context.saveWhenChanged()
+
+            XCTAssertEqual(memosCount(context: context), 10)
+            // test order
+            let sortedItems = note.memos?.array as! [Memo]
+            for i in 0..<10 {
+                XCTAssertEqual(sortedItems[i].text, "\(i)")
+            }
+
+            // clone
+            let cloneNote = try! cloner.clone(object: note) as! Note
+            let sortedCloneItems = cloneNote.memos?.array as! [Memo]
+            for i in 0..<10 {
+                XCTAssertEqual(sortedCloneItems[i].text, "\(i)")
+            }
+
+            // count
+            XCTAssertEqual(memosCount(context: context), 20)
+            XCTAssertEqual(notesCount(context: context), 2)
+        }
+    }
+
+    // test withoutParent two options: blank & keep
+    func testWithoutParent() {
+        let context = container.newBackgroundContext()
+        context.performAndWait {
+            let note = newNote(context: context)
+
+            let item = Item(context: context)
+            item.note = note
+            item.noteIDBlank = note.id
+            item.noteIDKeep = note.id
+            item.name = "item"
+
+            context.saveWhenChanged()
+
+            XCTAssertEqual(itemsCount(context: context), 1)
+            XCTAssertEqual(notesCount(context: context), 1)
+
+            // clone from middle of relationship chain , exclude "note"
+            let cloneItem = try! cloner.clone(object: item, excludedRelationshipNames: ["note"]) as! Item
+            XCTAssertEqual(itemsCount(context: context), 2)
+            XCTAssertEqual(notesCount(context: context), 1)
+
+            XCTAssertNil(cloneItem.note)
+
+            // blank should be nil, optional
+            XCTAssertNil(cloneItem.noteIDBlank)
+
+            // keep should be note.id
+            XCTAssertEqual(cloneItem.noteIDKeep, note.id)
+        }
     }
 }
