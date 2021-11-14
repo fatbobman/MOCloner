@@ -7,13 +7,18 @@
             </userInfo>
         </attribute>
         <attribute name="name" optional="YES" attributeType="String"/>
-        <attribute name="noteID" optional="YES" attributeType="UUID" usesScalarValueType="NO">
+        <attribute name="noteIDBlank" optional="YES" attributeType="UUID" usesScalarValueType="NO">
             <userInfo>
                 <entry key="followParent" value="id"/>
                 <entry key="withoutParent" value="blank"/>
             </userInfo>
         </attribute>
-        <relationship name="itemDescription" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="NoteDescription"/>
+        <attribute name="noteIDKeep" optional="YES" attributeType="UUID" usesScalarValueType="NO">
+            <userInfo>
+                <entry key="followParent" value="id"/>
+                <entry key="withoutParent" value="keep"/>
+            </userInfo>
+        </attribute>
         <relationship name="note" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Note" inverseName="items" inverseEntity="Note"/>
         <relationship name="toManyTags" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="ToManyTag" inverseName="items" inverseEntity="ToManyTag"/>
         <relationship name="toOneTag" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="ToOneTag" inverseName="items" inverseEntity="ToOneTag"/>

@@ -70,6 +70,39 @@ extension MOClonerTests {
         }
         return count
     }
+
+    func noteDescriptionsCount(context:NSManagedObjectContext) -> Int {
+        var count = 0
+        context.performAndWait {
+            let request = NSFetchRequest<NSNumber>(entityName: NoteDescription.name)
+            request.resultType = .countResultType
+            let result = try! context.fetch(request).first!
+            count = result.intValue
+        }
+        return count
+    }
+
+    func toOneTagsCount(context:NSManagedObjectContext) -> Int {
+        var count = 0
+        context.performAndWait {
+            let request = NSFetchRequest<NSNumber>(entityName: ToOneTag.name)
+            request.resultType = .countResultType
+            let result = try! context.fetch(request).first!
+            count = result.intValue
+        }
+        return count
+    }
+
+    func toManyTagsCount(context:NSManagedObjectContext) -> Int {
+        var count = 0
+        context.performAndWait {
+            let request = NSFetchRequest<NSNumber>(entityName: ToManyTag.name)
+            request.resultType = .countResultType
+            let result = try! context.fetch(request).first!
+            count = result.intValue
+        }
+        return count
+    }
 }
 
 extension NSManagedObjectContext {
