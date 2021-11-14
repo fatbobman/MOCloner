@@ -48,6 +48,28 @@ extension MOClonerTests {
         context.saveWhenChanged()
         return note
     }
+
+    func notesCount(context:NSManagedObjectContext) -> Int{
+        var count = 0
+        context.performAndWait {
+            let request = NSFetchRequest<NSNumber>(entityName: Note.name)
+            request.resultType = .countResultType
+            let result = try! context.fetch(request).first!
+            count = result.intValue
+        }
+        return count
+    }
+
+    func itemsCount(context:NSManagedObjectContext) -> Int {
+        var count = 0
+        context.performAndWait {
+            let request = NSFetchRequest<NSNumber>(entityName: Item.name)
+            request.resultType = .countResultType
+            let result = try! context.fetch(request).first!
+            count = result.intValue
+        }
+        return count
+    }
 }
 
 extension NSManagedObjectContext {

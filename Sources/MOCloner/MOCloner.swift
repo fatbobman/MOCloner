@@ -229,7 +229,7 @@ public struct MOCloner {
                let originalToOneObject = originalObject.primitiveValue(forKey: relationshipName) as? NSManagedObject {
                 let newToOneObject = try cloneNSMangedObject(
                     originalToOneObject,
-                    parentObject: nil,
+                    parentObject: originalObject,
                     parentCloneObject: cloneObject,
                     excludedRelationshipNames: passingExclusionList ? excludedRelationshipNames : [],
                     saveBeforeReturn: false,
